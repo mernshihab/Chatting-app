@@ -26,7 +26,6 @@ const UserList = () => {
   };
 
   let handleSearch = (e) => {
-    console.log(e.target.value);
     let arr = [];
     if (e.target.value.lengt === 0) {
       setFilterUserList([]);

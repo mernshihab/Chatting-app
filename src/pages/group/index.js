@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import Sidebar from "../../components/Sidebar";
 import GroupList from "../../components/GroupList";
@@ -13,7 +13,7 @@ const Group = () => {
     if (!data) {
       navigate("/login");
     }
-  }, []);
+  }, [data,navigate]);
   return (
     <>
       {data && (

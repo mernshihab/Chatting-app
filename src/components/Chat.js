@@ -43,16 +43,9 @@ const Chat = () => {
   let data = useSelector((state) => state.userLoginInfo.userInfo);
   let activeChatName = useSelector((state) => state.activeChat);
 
-  console.log("Active chat name:", activeChatName);
-
-  if (activeChatName.active !== null) {
-    console.log("Redux holo null");
-  } else {
-    console.log("redux vodro lok");
-  }
 
   let handleMsg = () => {
-    if (activeChatName.active && activeChatName.active.status == "single") {
+    if (activeChatName.active && activeChatName.active.status === "single") {
       set(push(ref(db, "singleMsg")), {
         msg: msg,
         whoSendId: data.uid,
@@ -86,7 +79,7 @@ const Chat = () => {
 
   let handleEnterPress = (e) => {
     if (e.key === "Enter") {
-      if (activeChatName.active && activeChatName.active.status == "single") {
+      if (activeChatName.active && activeChatName.active.status === "single") {
         set(push(ref(db, "singleMsg")), {
           msg: msg,
           whoSendId: data.uid,
@@ -120,7 +113,6 @@ const Chat = () => {
   };
 
   let handleAudioSend = (mediaBlobUrl) => {
-    console.log(mediaBlobUrl);
     const audioStorageRef = stref(storage, "audio/" + audioUrl);
     uploadBytes(audioStorageRef, audioUrl).then((snapshot) => {
       getDownloadURL(audioStorageRef).then((downloadURL) => {
@@ -234,7 +226,6 @@ const Chat = () => {
       snapshot.forEach((item) => {
         arr.push(item.val().groupId + item.val().memberId);
       });
-      console.log("ami memberlist", arr);
       setGroupMemberList(arr);
     });
   }, []);
@@ -386,7 +377,9 @@ const Chat = () => {
                 )
           )
         ) : (
-          <h1>you are not a member of this group</h1>
+          <div className="w-full h-full flex justify-center items-center">
+            <h1 className="text-3xl font-bold">you are not a member of this group</h1>
+          </div>
         )}
         {/* recieve message start */}
         {/* <div className="mb-8">
