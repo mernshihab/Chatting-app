@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { RiEyeCloseFill, RiEyeFill } from "react-icons/ri";
 import { ToastContainer, toast } from "react-toastify";
 import { BallTriangle } from "react-loader-spinner";
-import { useNavigate, Link, json } from "react-router-dom";
+import { useNavigate, Link} from "react-router-dom";
 import {
   getAuth,
   signInWithEmailAndPassword,
@@ -11,7 +11,7 @@ import {
 } from "firebase/auth";
 import { getDatabase, ref, set } from "firebase/database";
 import { useDispatch } from "react-redux";
-import userSlice, { userLoginInfo } from "../../slices/userSlice";
+import { userLoginInfo } from "../../slices/userSlice";
 
 const Login = () => {
   const auth = getAuth();

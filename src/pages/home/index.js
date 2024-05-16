@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect} from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import BlockedUser from "../../components/BlockedUser";
@@ -11,7 +11,7 @@ import Sidebar from "../../components/Sidebar";
 import UserList from "../../components/UserList";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useDispatch } from "react-redux";
-import userSlice, { userLoginInfo } from "../../slices/userSlice";
+import { userLoginInfo } from "../../slices/userSlice";
 
 const Home = () => {
   const auth = getAuth();

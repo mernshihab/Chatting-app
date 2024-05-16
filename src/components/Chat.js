@@ -3,13 +3,11 @@ import {
   BsThreeDotsVertical,
   BsTriangleFill,
   BsFillCameraFill,
-  BsSnapchat,
 } from "react-icons/bs";
 import { TbSend } from "react-icons/tb";
 import { GrGallery } from "react-icons/gr";
 import { AiFillAudio, AiFillCloseCircle } from "react-icons/ai";
 import { MdEmojiEmotions } from "react-icons/md";
-import { ImCross } from "react-icons/im";
 import { FaStop } from "react-icons/fa";
 import ModalImage from "react-modal-image";
 import Camera, { FACING_MODES, IMAGE_TYPES } from "react-html5-camera-photo";
@@ -87,7 +85,6 @@ const Chat = () => {
 
   let handleEnterPress = (e) => {
     if (e.key === "Enter") {
-      
       if (activeChatName.active && activeChatName.active.status == "single") {
         set(push(ref(db, "singleMsg")), {
           msg: msg,
@@ -179,6 +176,7 @@ const Chat = () => {
   };
 
   function handleTakePhoto(dataUri) {
+    setCaptureImage(captureImage);
     setCaptureImage(dataUri);
     const storageRef = stref(storage, "some-child");
 
