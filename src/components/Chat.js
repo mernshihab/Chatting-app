@@ -27,6 +27,7 @@ import {
 } from "firebase/storage";
 import { ReactMediaRecorder } from "react-media-recorder";
 import EmojiPicker from "emoji-picker-react";
+import ScrollToBottom from "react-scroll-to-bottom";
 
 const Chat = () => {
   const db = getDatabase();
@@ -40,9 +41,16 @@ const Chat = () => {
   let [groupMemberList, setGroupMemberList] = useState([]);
   let [captureImage, setCaptureImage] = useState("");
   let [audioUrl, setAudioUrl] = useState("");
-  let [blob, setBlob] = useState();
   let data = useSelector((state) => state.userLoginInfo.userInfo);
   let activeChatName = useSelector((state) => state.activeChat);
+
+  console.log("Active chat name:", activeChatName);
+
+  if (activeChatName.active !== null) {
+    console.log("Redux holo null");
+  } else {
+    console.log("redux vodro lok");
+  }
 
   let handleMsg = () => {
     if (activeChatName.active && activeChatName.active.status == "single") {
@@ -70,7 +78,46 @@ const Chat = () => {
         date: `${new Date().getFullYear()}-${
           new Date().getMonth() + 1
         }-${new Date().getDate()}  ${new Date().getHours()}:${new Date().getMinutes()}`,
+      }).then(() => {
+        setShowEmoji(false);
+        setMsg("");
       });
+    }
+  };
+
+  let handleEnterPress = (e) => {
+    if (e.key === "Enter") {
+      
+      if (activeChatName.active && activeChatName.active.status == "single") {
+        set(push(ref(db, "singleMsg")), {
+          msg: msg,
+          whoSendId: data.uid,
+          whoSendName: data.displayName,
+          whoReceiveId: activeChatName.active.id,
+          whoReceiveName: activeChatName.active.name,
+          date: `${new Date().getFullYear()}-${
+            new Date().getMonth() + 1
+          }-${new Date().getDate()}  ${new Date().getHours()}:${new Date().getMinutes()}`,
+        }).then(() => {
+          setShowEmoji(false);
+          setMsg("");
+        });
+      } else {
+        set(push(ref(db, "groupMsg")), {
+          msg: msg,
+          whoSendId: data.uid,
+          whoSendName: data.displayName,
+          whoReceiveId: activeChatName.active.id,
+          whoReceiveName: activeChatName.active.name,
+          adminId: activeChatName.active.adminId,
+          date: `${new Date().getFullYear()}-${
+            new Date().getMonth() + 1
+          }-${new Date().getDate()}  ${new Date().getHours()}:${new Date().getMinutes()}`,
+        }).then(() => {
+          setShowEmoji(false);
+          setMsg("");
+        });
+      }
     }
   };
 
@@ -128,7 +175,6 @@ const Chat = () => {
   };
 
   let handleEmojiClick = (emoji) => {
-    console.log(emoji.emoji);
     setMsg(msg + emoji.emoji);
   };
 
@@ -189,7 +235,7 @@ const Chat = () => {
       snapshot.forEach((item) => {
         arr.push(item.val().groupId + item.val().memberId);
       });
-      console.log("ami memberlist",arr);
+      console.log("ami memberlist", arr);
       setGroupMemberList(arr);
     });
   }, []);
@@ -213,11 +259,11 @@ const Chat = () => {
             <p className="font-poppins font-regular text-sm">Online</p>
           </div>
         </div>
-        <div className="">
+        <div>
           <BsThreeDotsVertical className="text-2xl" />
         </div>
       </div>
-      <div className="pt-7 overflow-y-auto px-2 h-[700px] border-b border-solid border-slate-200">
+      <ScrollToBottom className="pt-7 overflow-y-auto px-2 h-[700px] border-b border-solid border-slate-200">
         {activeChatName.active && activeChatName.active.status == "single" ? (
           msgList.map((item) =>
             item.whoSendId == data.uid
@@ -300,8 +346,11 @@ const Chat = () => {
                   </div>
                 ))
           )
-        ) :  activeChatName.active && activeChatName.active.adminId == data.uid  ||
-          groupMemberList.includes(activeChatName.active && activeChatName.active.id + data.uid) ? (
+        ) : (activeChatName.active &&
+            activeChatName.active.adminId == data.uid) ||
+          groupMemberList.includes(
+            activeChatName.active && activeChatName.active.id + data.uid
+          ) ? (
           gmsgList.map((item) =>
             item.whoSendId == data.uid
               ? item.whoReceiveId == activeChatName.active.id && (
@@ -499,111 +548,230 @@ const Chat = () => {
             <EmojiPicker onEmojiClick={(emoji) => handleEmojiClick(emoji)} />
           </div>
         )}
-      </div>
-      {activeChatName && activeChatName.active.adminId === data.uid ||
-        (groupMemberList.includes(activeChatName.active.id + data.uid) && (
-          <div className="flex mt-5">
-            <div className="relative flex w-[90%]">
-              <input
-                onChange={(e) => setMsg(e.target.value)}
-                className="bg-slate-100 p-4 w-full rounded-lg shadow-sm border"
-                value={msg}
-              />
-              <label>
+      </ScrollToBottom>
+      {(() => {
+        if (activeChatName.active && activeChatName.active.status == "single") {
+          return (
+            <div className="flex mt-5">
+              <div className="relative flex w-[90%]">
                 <input
-                  onChange={handleImageUpload}
-                  className="hidden"
-                  type="file"
+                  onChange={(e) => setMsg(e.target.value)}
+                  onKeyUp={handleEnterPress}
+                  className="bg-slate-100 p-4 w-full rounded-lg shadow-sm border"
+                  value={msg}
                 />
-                <GrGallery className="absolute right-5 bottom-1/4 text-2xl" />
-              </label>
-              <BsFillCameraFill
-                onClick={() => setCheck(!check)}
-                className="absolute right-14 bottom-1/4 text-2xl"
-              />
-              <ReactMediaRecorder
-                audio
-                onStop={(mediaBlobUrl) => {
-                  setAudioUrl(mediaBlobUrl);
-                }}
-                render={({
-                  status,
-                  startRecording,
-                  stopRecording,
-                  mediaBlobUrl,
-                }) => (
-                  <div>
-                    <p
-                      className={`bg-red-500 font-opensans font-semibold text-white py-1 px-2 rounded-md absolute -top-5 right-14 ${
-                        status == "idle" && "hidden"
-                      } ${status == "stopped" && "hidden"}`}
-                    >
-                      {status}
-                    </p>
-                    {status == "recording" ? (
-                      <button onClick={stopRecording}>
-                        <FaStop
-                          title="Stop Recording"
-                          className="absolute right-[90px] bottom-1/4 mb-[2px] text-xl"
-                        />
-                      </button>
-                    ) : (
-                      <button onClick={startRecording}>
-                        <AiFillAudio
-                          title="Start Recording"
-                          className="absolute right-[90px] bottom-1/4 text-2xl"
-                        />
-                      </button>
-                    )}
-                    {audioUrl && (
-                      <button
-                        onClick={() => handleAudioSend(mediaBlobUrl)}
-                        className="absolute bg-green-500 py-[5px] px-3 font-poppins font-semibold text-sm rounded-md -top-4 right-12"
-                      >
-                        Send Audio
-                      </button>
-                    )}
-                  </div>
-                )}
-              />
-              <MdEmojiEmotions
-                onClick={() => setShowEmoji(!showEmoji)}
-                className="absolute right-[120px] bottom-1/4 text-2xl"
-              />
-            </div>
-            {check && (
-              <div className="w-full h-screen absolute top-0 left-0 bg-[rgba(0,0,0,.8)] z-50 flex justify-center items-center">
-                <Camera
-                  onTakePhoto={(dataUri) => {
-                    handleTakePhoto(dataUri);
-                  }}
-                  idealFacingMode={FACING_MODES.ENVIRONMENT}
-                  idealResolution={{ width: 640, height: 480 }}
-                  imageType={IMAGE_TYPES.JPG}
-                  imageCompression={0.97}
-                  isMaxResolution={true}
-                  isImageMirror={false}
-                  isSilentMode={false}
-                  isDisplayStartCameraError={true}
-                  isFullscreen={false}
-                  sizeFactor={1}
-                />
-                <AiFillCloseCircle
-                  title="Close"
+                <label>
+                  <input
+                    onChange={handleImageUpload}
+                    className="hidden"
+                    type="file"
+                  />
+                  <GrGallery className="absolute right-5 bottom-1/4 text-2xl" />
+                </label>
+                <BsFillCameraFill
                   onClick={() => setCheck(!check)}
-                  className="text-white text-4xl ml-3"
+                  className="absolute right-14 bottom-1/4 text-2xl"
+                />
+                <ReactMediaRecorder
+                  audio
+                  onStop={(mediaBlobUrl) => {
+                    setAudioUrl(mediaBlobUrl);
+                  }}
+                  render={({
+                    status,
+                    startRecording,
+                    stopRecording,
+                    mediaBlobUrl,
+                  }) => (
+                    <div>
+                      <p
+                        className={`bg-red-500 font-opensans font-semibold text-white py-1 px-2 rounded-md absolute -top-5 right-14 ${
+                          status == "idle" && "hidden"
+                        } ${status == "stopped" && "hidden"}`}
+                      >
+                        {status}
+                      </p>
+                      {status == "recording" ? (
+                        <button onClick={stopRecording}>
+                          <FaStop
+                            title="Stop Recording"
+                            className="absolute right-[90px] bottom-1/4 mb-[2px] text-xl"
+                          />
+                        </button>
+                      ) : (
+                        <button onClick={startRecording}>
+                          <AiFillAudio
+                            title="Start Recording"
+                            className="absolute right-[90px] bottom-1/4 text-2xl"
+                          />
+                        </button>
+                      )}
+                      {audioUrl && (
+                        <button
+                          onClick={() => handleAudioSend(mediaBlobUrl)}
+                          className="absolute bg-green-500 py-[5px] px-3 font-poppins font-semibold text-sm rounded-md -top-4 right-12"
+                        >
+                          Send Audio
+                        </button>
+                      )}
+                    </div>
+                  )}
+                />
+                <MdEmojiEmotions
+                  onClick={() => setShowEmoji(!showEmoji)}
+                  className="absolute right-[120px] bottom-1/4 text-2xl"
                 />
               </div>
-            )}
-            <button
-              onClick={handleMsg}
-              title="Send"
-              className="ml-5 bg-primary px-4 rounded-xl"
-            >
-              <TbSend className="text-3xl text-white" />
-            </button>
-          </div>
-        ))}
+              {check && (
+                <div className="w-full h-screen absolute top-0 left-0 bg-[rgba(0,0,0,.8)] z-50 flex justify-center items-center">
+                  <Camera
+                    onTakePhoto={(dataUri) => {
+                      handleTakePhoto(dataUri);
+                    }}
+                    idealFacingMode={FACING_MODES.ENVIRONMENT}
+                    idealResolution={{ width: 640, height: 480 }}
+                    imageType={IMAGE_TYPES.JPG}
+                    imageCompression={0.97}
+                    isMaxResolution={true}
+                    isImageMirror={false}
+                    isSilentMode={false}
+                    isDisplayStartCameraError={true}
+                    isFullscreen={false}
+                    sizeFactor={1}
+                  />
+                  <AiFillCloseCircle
+                    title="Close"
+                    onClick={() => setCheck(!check)}
+                    className="text-white text-4xl ml-3"
+                  />
+                </div>
+              )}
+              <button
+                onClick={handleMsg}
+                title="Send"
+                className="ml-5 bg-primary px-4 rounded-xl"
+              >
+                <TbSend className="text-3xl text-white" />
+              </button>
+            </div>
+          );
+        } else if (
+          activeChatName.active &&
+          activeChatName.active.status == "group"
+        ) {
+          if (
+            activeChatName.active.adminId == data.uid ||
+            groupMemberList.includes(
+              activeChatName.active && activeChatName.active.id + data.uid
+            )
+          ) {
+            return (
+              <div className="flex mt-5">
+                <div className="relative flex w-[90%]">
+                  <input
+                    onChange={(e) => setMsg(e.target.value)}
+                    onKeyUp={handleEnterPress}
+                    className="bg-slate-100 p-4 w-full rounded-lg shadow-sm border"
+                    value={msg}
+                  />
+                  <label>
+                    <input
+                      onChange={handleImageUpload}
+                      className="hidden"
+                      type="file"
+                    />
+                    <GrGallery className="absolute right-5 bottom-1/4 text-2xl" />
+                  </label>
+                  <BsFillCameraFill
+                    onClick={() => setCheck(!check)}
+                    className="absolute right-14 bottom-1/4 text-2xl"
+                  />
+                  <ReactMediaRecorder
+                    audio
+                    onStop={(mediaBlobUrl) => {
+                      setAudioUrl(mediaBlobUrl);
+                    }}
+                    render={({
+                      status,
+                      startRecording,
+                      stopRecording,
+                      mediaBlobUrl,
+                    }) => (
+                      <div>
+                        <p
+                          className={`bg-red-500 font-opensans font-semibold text-white py-1 px-2 rounded-md absolute -top-5 right-14 ${
+                            status == "idle" && "hidden"
+                          } ${status == "stopped" && "hidden"}`}
+                        >
+                          {status}
+                        </p>
+                        {status == "recording" ? (
+                          <button onClick={stopRecording}>
+                            <FaStop
+                              title="Stop Recording"
+                              className="absolute right-[90px] bottom-1/4 mb-[2px] text-xl"
+                            />
+                          </button>
+                        ) : (
+                          <button onClick={startRecording}>
+                            <AiFillAudio
+                              title="Start Recording"
+                              className="absolute right-[90px] bottom-1/4 text-2xl"
+                            />
+                          </button>
+                        )}
+                        {audioUrl && (
+                          <button
+                            onClick={() => handleAudioSend(mediaBlobUrl)}
+                            className="absolute bg-green-500 py-[5px] px-3 font-poppins font-semibold text-sm rounded-md -top-4 right-12"
+                          >
+                            Send Audio
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  />
+                  <MdEmojiEmotions
+                    onClick={() => setShowEmoji(!showEmoji)}
+                    className="absolute right-[120px] bottom-1/4 text-2xl"
+                  />
+                </div>
+                {check && (
+                  <div className="w-full h-screen absolute top-0 left-0 bg-[rgba(0,0,0,.8)] z-50 flex justify-center items-center">
+                    <Camera
+                      onTakePhoto={(dataUri) => {
+                        handleTakePhoto(dataUri);
+                      }}
+                      idealFacingMode={FACING_MODES.ENVIRONMENT}
+                      idealResolution={{ width: 640, height: 480 }}
+                      imageType={IMAGE_TYPES.JPG}
+                      imageCompression={0.97}
+                      isMaxResolution={true}
+                      isImageMirror={false}
+                      isSilentMode={false}
+                      isDisplayStartCameraError={true}
+                      isFullscreen={false}
+                      sizeFactor={1}
+                    />
+                    <AiFillCloseCircle
+                      title="Close"
+                      onClick={() => setCheck(!check)}
+                      className="text-white text-4xl ml-3"
+                    />
+                  </div>
+                )}
+                <button
+                  onClick={handleMsg}
+                  title="Send"
+                  className="ml-5 bg-primary px-4 rounded-xl"
+                >
+                  <TbSend className="text-3xl text-white" />
+                </button>
+              </div>
+            );
+          }
+        }
+      })()}
     </div>
   );
 };

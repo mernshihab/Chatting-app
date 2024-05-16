@@ -72,8 +72,9 @@ const MsgGroups = () => {
           </h1>
         </div>
       ) : (
-        groups.map((item) => (
+        groups.map((item,i) => (
           <div
+            key={i}
             onClick={() => handleGroupChat(item)}
             className="flex justify-between mt-4 pt-5 w-full relative after:w-[400px] after:h-px after:bottom-[-13px] after:left-1 after:content-['']  after:absolute after:bg-[#BFBFBF]"
           >

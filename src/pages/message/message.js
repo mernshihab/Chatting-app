@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import Sidebar from "../../components/Sidebar";
 import Search from "../../components/Search";
@@ -15,7 +15,7 @@ const Message = () => {
     if (!data) {
       navigate("/login");
     }
-  }, []);
+  }, [data,navigate]);
 
   return (
     <>

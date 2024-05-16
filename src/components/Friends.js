@@ -73,8 +73,8 @@ const Friends = () => {
         <h1 className="font-nunito font-bold text-xl text-black">No friends available</h1>
       </div>
       :
-      friendlist.map((item) => (
-        <div className="flex mt-4 pt-5">
+      friendlist.map((item,i) => (
+        <div key={i} className="flex mt-4 pt-5">
           <img
             className="w-[70px] h-[70px] rounded-full mt-0.5"
             alt=""

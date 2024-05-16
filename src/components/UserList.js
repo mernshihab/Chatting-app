@@ -98,8 +98,8 @@ const UserList = () => {
         <FiSearch className="text-lg absolute top-1/3 left-[23px]" />
       </div>
       {filterUserList.length > 0
-        ? filterUserList.map((item) => (
-            <div className="flex mb-4 pt-5 after:w-[400px] after:h-px after:bottom-[-18px] after:left-1 after:content-[''] relative after:absolute after:bg-[#BFBFBF]">
+        ? filterUserList.map((item,i) => (
+            <div key={i} className="flex mb-4 pt-5 after:w-[400px] after:h-px after:bottom-[-18px] after:left-1 after:content-[''] relative after:absolute after:bg-[#BFBFBF]">
               <img
                 className="w-[70px] h-[70px] rounded-full mt-0.5"
                 src={item.profilePhoto}
@@ -140,8 +140,8 @@ const UserList = () => {
               </div>
             </div>
           ))
-        : userlist.map((item) => (
-            <div className="flex mb-4 pt-5 after:w-[400px] after:h-px after:bottom-[-18px] after:left-1 after:content-[''] relative after:absolute after:bg-[#BFBFBF]">
+        : userlist.map((item,i) => (
+            <div key={i} className="flex mb-4 pt-5 after:w-[400px] after:h-px after:bottom-[-18px] after:left-1 after:content-[''] relative after:absolute after:bg-[#BFBFBF]">
               <img
                 className="w-[70px] h-[70px] rounded-full mt-0.5"
                 src={item.profilePhoto}
