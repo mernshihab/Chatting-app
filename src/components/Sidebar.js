@@ -97,7 +97,7 @@ const Sidebar = ({ active }) => {
   };
 
   return (
-    <div className="bg-primary h-screen rounded-3xl p-9">
+    <div className="bg-primary h-full rounded-3xl p-9">
       <div className="group relative w-28 h-28 rounded-full">
         <img
           className="w-full mx-auto h-full rounded-full"

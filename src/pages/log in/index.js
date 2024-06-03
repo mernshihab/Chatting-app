@@ -217,7 +217,7 @@ const Login = () => {
       </div>
       <div className="w-2/4 hidden xl:block">
         <img
-          className="object-cover w-full h-screen"
+          className="object-cover w-full h-full"
           src="images/loginimg.png"
           alt=""
         />

@@ -108,7 +108,7 @@ const Registration = () => {
   return (
     <div className="flex">
       <ToastContainer position="bottom-center" theme="dark" />
-      <div className="w-full lg:w-2/4  px-5 lg:flex bg-gray-300 h-screen md:h-screen land:h-full justify-end lg:px-3 xl:px-0">
+      <div className="w-full lg:w-2/4  px-5 lg:flex bg-gray-300 h-screen md:h-full land:h-full justify-end lg:px-3 xl:px-0">
         <div className="lg:mr-16 mt-6 lg:mt-6 xl:mt-36 md:mt-36">
           <h1 className="font-nunito font-bold xl:text-4xl text-3xl text-center xl:text-left text-zinc-900 mb-3">
             Get started with easily register

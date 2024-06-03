@@ -43,42 +43,8 @@ const Chat = () => {
   let data = useSelector((state) => state.userLoginInfo.userInfo);
   let activeChatName = useSelector((state) => state.activeChat);
 
-
   let handleMsg = () => {
-    if (activeChatName.active && activeChatName.active.status === "single") {
-      set(push(ref(db, "singleMsg")), {
-        msg: msg,
-        whoSendId: data.uid,
-        whoSendName: data.displayName,
-        whoReceiveId: activeChatName.active.id,
-        whoReceiveName: activeChatName.active.name,
-        date: `${new Date().getFullYear()}-${
-          new Date().getMonth() + 1
-        }-${new Date().getDate()}  ${new Date().getHours()}:${new Date().getMinutes()}`,
-      }).then(() => {
-        setShowEmoji(false);
-        setMsg("");
-      });
-    } else {
-      set(push(ref(db, "groupMsg")), {
-        msg: msg,
-        whoSendId: data.uid,
-        whoSendName: data.displayName,
-        whoReceiveId: activeChatName.active.id,
-        whoReceiveName: activeChatName.active.name,
-        adminId: activeChatName.active.adminId,
-        date: `${new Date().getFullYear()}-${
-          new Date().getMonth() + 1
-        }-${new Date().getDate()}  ${new Date().getHours()}:${new Date().getMinutes()}`,
-      }).then(() => {
-        setShowEmoji(false);
-        setMsg("");
-      });
-    }
-  };
-
-  let handleEnterPress = (e) => {
-    if (e.key === "Enter") {
+    if (msg) {
       if (activeChatName.active && activeChatName.active.status === "single") {
         set(push(ref(db, "singleMsg")), {
           msg: msg,
@@ -108,6 +74,46 @@ const Chat = () => {
           setShowEmoji(false);
           setMsg("");
         });
+      }
+    }
+  };
+
+  let handleEnterPress = (e) => {
+    if (msg) {
+      if (e.key === "Enter") {
+        if (
+          activeChatName.active &&
+          activeChatName.active.status === "single"
+        ) {
+          set(push(ref(db, "singleMsg")), {
+            msg: msg,
+            whoSendId: data.uid,
+            whoSendName: data.displayName,
+            whoReceiveId: activeChatName.active.id,
+            whoReceiveName: activeChatName.active.name,
+            date: `${new Date().getFullYear()}-${
+              new Date().getMonth() + 1
+            }-${new Date().getDate()}  ${new Date().getHours()}:${new Date().getMinutes()}`,
+          }).then(() => {
+            setShowEmoji(false);
+            setMsg("");
+          });
+        } else {
+          set(push(ref(db, "groupMsg")), {
+            msg: msg,
+            whoSendId: data.uid,
+            whoSendName: data.displayName,
+            whoReceiveId: activeChatName.active.id,
+            whoReceiveName: activeChatName.active.name,
+            adminId: activeChatName.active.adminId,
+            date: `${new Date().getFullYear()}-${
+              new Date().getMonth() + 1
+            }-${new Date().getDate()}  ${new Date().getHours()}:${new Date().getMinutes()}`,
+          }).then(() => {
+            setShowEmoji(false);
+            setMsg("");
+          });
+        }
       }
     }
   };
@@ -378,7 +384,9 @@ const Chat = () => {
           )
         ) : (
           <div className="w-full h-full flex justify-center items-center">
-            <h1 className="text-3xl font-bold">you are not a member of this group</h1>
+            <h1 className="text-3xl font-bold">
+              you are not a member of this group
+            </h1>
           </div>
         )}
         {/* recieve message start */}
@@ -628,7 +636,7 @@ const Chat = () => {
                     isImageMirror={false}
                     isSilentMode={false}
                     isDisplayStartCameraError={true}
-                    isFullscreen={false}
+                    isFullscreen={true}
                     sizeFactor={1}
                   />
                   <AiFillCloseCircle
