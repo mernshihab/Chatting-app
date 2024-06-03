@@ -636,7 +636,7 @@ const Chat = () => {
                     isImageMirror={false}
                     isSilentMode={false}
                     isDisplayStartCameraError={true}
-                    isFullscreen={true}
+                    isFullscreen={false}
                     sizeFactor={1}
                   />
                   <AiFillCloseCircle
