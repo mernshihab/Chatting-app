@@ -105,6 +105,79 @@ const Registration = () => {
     }
   };
 
+  let handleEnterPress = (e) => {
+    if (e.key === "Enter") {
+      if (!email) {
+        setEmailerr("Email Is Requird");
+      } else {
+        if (
+          !/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+            email
+          )
+        ) {
+          setEmailerr("Email Is Invalid");
+        }
+      }
+      if (!fullname) {
+        setFullnameerr("Full Name Is Requird");
+      }
+      if (!password) {
+        setPassworderr("Password Is Requird");
+      } else {
+        if (!/^(?=.{6,})/.test(password)) {
+          setPassworderr("Password Is Invalid");
+        }
+      }
+      if (
+        email &&
+        fullname &&
+        password &&
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+          email
+        ) &&
+        /^(?=.{6,})/.test(password)
+      ) {
+        setLoading(true);
+        createUserWithEmailAndPassword(auth, email, password)
+          .then((user) => {
+            updateProfile(auth.currentUser, {
+              displayName: fullname,
+              photoURL: "images/profilepic.png",
+            })
+              .then(() => {
+                toast.success(
+                  "Registration Succesful please verify your Email"
+                );
+                setEmail("");
+                setFullname("");
+                setPassword("");
+                sendEmailVerification(auth.currentUser);
+                setLoading(false);
+                setTimeout(() => {
+                  navigate("/login");
+                }, 2000);
+              })
+              .then(() => {
+                set(ref(db, "users/" + user.user.uid), {
+                  username: user.user.displayName,
+                  email: user.user.email,
+                  profilePhoto: "images/profilepic.png",
+                });
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          })
+          .catch((error) => {
+            if (error.code.includes("auth/email-already-in-use")) {
+              setEmailerr("Email already in use");
+              setLoading(false);
+            }
+          });
+      }
+    }
+  };
+
   return (
     <div className="flex">
       <ToastContainer position="bottom-center" theme="dark" />
@@ -118,6 +191,7 @@ const Registration = () => {
           </p>
           <div className="relative mt-9 xl:mt-16">
             <input
+              onKeyUp={handleEnterPress}
               type="email"
               className="border-black border-solid border xl:w-96 w-full outline-none bg-gray-300 text-black  rounded-lg py-5 md:py-6 px-9 lg:px-14"
               onChange={handleEmail}
@@ -134,6 +208,7 @@ const Registration = () => {
           </div>
           <div className="relative mt-9 lg:mt-10 xl:mt-16">
             <input
+              onKeyUp={handleEnterPress}
               type="text"
               className="border-black outline-none bg-gray-300 border-solid border xl:w-96 w-full rounded-lg py-5 md:py-6 px-9 lg:px-14"
               onChange={handleFullname}
@@ -150,6 +225,7 @@ const Registration = () => {
           </div>
           <div className="relative mt-9 lg:mt-10 md:mt-16 xl:w-96 w-full">
             <input
+              onKeyUp={handleEnterPress}
               type={passwordshow ? "text" : "password"}
               className="border-black outline-none bg-gray-300 border-solid border rounded-lg md:py-6 py-5 w-full px-9 lg:px-14"
               onChange={handlePassword}

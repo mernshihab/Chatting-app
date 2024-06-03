@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { RiEyeCloseFill, RiEyeFill } from "react-icons/ri";
 import { ToastContainer, toast } from "react-toastify";
 import { BallTriangle } from "react-loader-spinner";
-import { useNavigate, Link} from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
   getAuth,
   signInWithEmailAndPassword,
@@ -86,6 +86,59 @@ const Login = () => {
     }
   };
 
+  let handleEnterPress = (e) => {
+    if (e.key === "Enter") {
+      if (!email) {
+        setEmailerr("Email Is Requird");
+      } else {
+        if (
+          !/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+            email
+          )
+        ) {
+          setEmailerr("Email Is Invalid");
+        }
+      }
+      if (!password) {
+        setPassworderr("Password Is Requird");
+      } else {
+        if (!/^(?=.{6,})/.test(password)) {
+          setPassworderr("Password Is Invalid");
+        }
+      }
+      if (
+        email &&
+        password &&
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+          email
+        ) &&
+        /^(?=.{6,})/.test(password)
+      ) {
+        setLoading(true);
+        signInWithEmailAndPassword(auth, email, password)
+          .then((user) => {
+            setLoading(false);
+            toast.success("log in succes");
+            dispacth(userLoginInfo(user.user));
+            localStorage.setItem("userInfo", JSON.stringify(user));
+            setTimeout(() => {
+              navigate("/");
+            }, 2000);
+          })
+          .catch((error) => {
+            const errorCode = error.code;
+            if (errorCode.includes("auth/user-not-found")) {
+              setEmailerr("Email is not found");
+            }
+            if (errorCode.includes("auth/wrong-password")) {
+              setPassworderr("Password not match");
+            }
+            setLoading(false);
+          });
+      }
+    }
+  };
+
   let handleGoogleSignIn = () => {
     signInWithPopup(auth, provider).then((user) => {
       toast.success("log in succes");
@@ -115,7 +168,7 @@ const Login = () => {
             onClick={handleGoogleSignIn}
             className="flex py-5 px-5 border border-solid w rounded-lg mt-6 sm:hidden xl:block"
           >
-            <img className="inline-block" src="images/Google.png" alt=""/>
+            <img className="inline-block" src="images/Google.png" alt="" />
             <h2 className="font-opensans inline-block font-semibold text-sm text-primary ml-2.5">
               Login with Google
             </h2>
@@ -123,6 +176,7 @@ const Login = () => {
           <div className="relative mt-16">
             <input
               type="email"
+              onKeyUp={handleEnterPress}
               className="border-para border-solid border-b w-full xl:w-96 py-6 outline-0"
               onChange={handleEmail}
               value={email}
@@ -139,6 +193,7 @@ const Login = () => {
           <div className="relative mt-16">
             <input
               type={passwordshow ? "text" : "password"}
+              onKeyUp={handleEnterPress}
               className="border-para border-solid border-b py-6 w-full xl:w-96 outline-0"
               onChange={handlePassword}
               value={password}
@@ -190,7 +245,7 @@ const Login = () => {
               onClick={handleGoogleSignIn}
               className="flex py-5 mt-7 justify-center border border-solid w-full shadow-sm rounded-lg xl:hidden"
             >
-              <img className="inline-block" src="images/Google.png "alt="" />
+              <img className="inline-block" src="images/Google.png " alt="" />
               <h2 className="font-opensans inline-block font-semibold text-sm text-primary ml-3">
                 Login with Google
               </h2>
